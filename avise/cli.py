@@ -40,9 +40,13 @@ logger = logging.getLogger(__name__)
 DEFAULT_REPORTS_DIR = "avise-reports"
 
 DEFAULT_SET_CONFIGS = {
+    # Language model SETs
+    "deceptive_delight": "configs/SET/languagemodel/multi_turn/deceptive_delight.json",
     "red_queen": "configs/SET/languagemodel/multi_turn/red_queen.json",
     "prompt_injection": "configs/SET/languagemodel/single_turn/prompt_injection_mini.json",
     "context_test": "configs/SET/languagemodel/multi_turn/context_test.json",
+    # Image generator SETs
+    "image_policy_compliance": "configs/SET/imagegenerator/single_turn/image_policy_compliance.json",
 }
 
 
@@ -181,13 +185,20 @@ def main(arguments=None) -> None:
     }
     report_format = format_map[args.format]
 
-    # Predefined connector configs
+    # Predefined connector configs (language model)
     if args.connectorconf == "ollama_lm":
         args.connectorconf = "configs/connector/languagemodel/ollama.json"
     elif args.connectorconf == "openai_lm":
         args.connectorconf = "configs/connector/languagemodel/openai.json"
     elif args.connectorconf == "genericrest_lm":
         args.connectorconf = "configs/connector/languagemodel/genericrest.json"
+    # Predefined connector configs (image generator)
+    elif args.connectorconf == "stable_diffusion":
+        args.connectorconf = "configs/connector/imagegenerator/stable_diffusion.json"
+    elif args.connectorconf == "gemini_image":
+        args.connectorconf = "configs/connector/imagegenerator/gemini.json"
+    elif args.connectorconf == "imagen":
+        args.connectorconf = "configs/connector/imagegenerator/imagen.json"
 
     for set_ in args.SET:
         try:

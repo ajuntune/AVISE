@@ -1,0 +1,13 @@
+{
+    "target_model": {
+        "connector": "stable-diffusion",
+        "type": "image_generator",
+        "name": "stable-diffusion",
+        "api_url": "API_URL",
+        "api_key": null,
+        "steps": 20,
+        "width": 512,
+        "height": 512,
+        "negative_prompt": ""
+    }
+}

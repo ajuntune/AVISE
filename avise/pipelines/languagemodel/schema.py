@@ -87,6 +87,9 @@ class EvaluationResult:
     elm_evaluation: Optional[str] = (
         None  # ELM evaluation result (if evaluation model was used)
     )
+    # Raw image bytes from image generator SETs. Never serialized to JSON/Markdown
+    # (too large); used only by the HTML reporter for inline image display.
+    image_data: Optional[bytes] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
@@ -101,6 +104,7 @@ class EvaluationResult:
         }
         if self.elm_evaluation:
             result["elm_evaluation"] = self.elm_evaluation
+        # image_data intentionally excluded — binary data is not serialized
         return result
 
 

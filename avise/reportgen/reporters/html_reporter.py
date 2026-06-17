@@ -1,5 +1,6 @@
 """HTML report writer."""
 
+import base64
 import re
 from pathlib import Path
 from typing import Dict, Any
@@ -85,6 +86,7 @@ class HTMLReporter(BaseReporter):
                             "full_conversation", []
                         ),
                         "description": result.metadata.get("description", ""),
+                        "image_data": result.image_data,
                     }
                     if result.elm_evaluation:
                         set_["elm_evaluation"] = result.elm_evaluation
@@ -320,6 +322,15 @@ class HTMLReporter(BaseReporter):
         .ai-content {{ white-space: pre-wrap; }}
         .ai-content h3, .ai-content h4 {{ margin: 15px 0 10px 0; }}
         .ai-content li {{ margin: 5px 0; }}
+        .generated-image {{
+            margin: 10px 0;
+        }}
+        .generated-image img {{
+            max-width: 100%;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            display: block;
+        }}
         details.category > summary {{
             list-style: none;
             cursor: pointer;
@@ -431,6 +442,7 @@ class HTMLReporter(BaseReporter):
                     "detections": result.detections,
                     "full_conversation": result.metadata.get("full_conversation", []),
                     "description": result.metadata.get("description", ""),
+                    "image_data": result.image_data,
                 }
                 if result.elm_evaluation:
                     set_["elm_evaluation"] = result.elm_evaluation
@@ -471,9 +483,22 @@ class HTMLReporter(BaseReporter):
         # Use prompt/response for non-conversation SETs
         prompt_response_html = ""
         if not conversation_html:
+            # Build the response block: image embed (if available) + text summary
+            image_data: bytes | None = set_.get("image_data")
+            if image_data:
+                b64 = base64.b64encode(image_data).decode("ascii")
+                image_html = f"""
+            <div class="label-sm">Generated Image</div>
+            <div class="generated-image">
+                <img src="data:image/png;base64,{b64}" alt="Generated image for {self.escape_html(set_.get('set_id', ''))}"/>
+            </div>"""
+            else:
+                image_html = ""
+
             prompt_response_html = f"""
             <div class="label-sm">Prompt</div>
             <div class="prompt">{self.escape_html(set_.get("prompt", ""))}</div>
+            {image_html}
             <div class="label-sm">Response</div>
             <div class="response">{self.escape_html(set_.get("response", ""))}</div>"""
 
