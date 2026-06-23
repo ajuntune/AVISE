@@ -487,10 +487,17 @@ class HTMLReporter(BaseReporter):
             image_data: bytes | None = set_.get("image_data")
             if image_data:
                 b64 = base64.b64encode(image_data).decode("ascii")
+                # Detect MIME type from magic bytes (Imagen returns JPEG, SD returns PNG)
+                if image_data[:2] == b"\xff\xd8":
+                    mime = "image/jpeg"
+                elif image_data[:4] == b"RIFF" and image_data[8:12] == b"WEBP":
+                    mime = "image/webp"
+                else:
+                    mime = "image/png"
                 image_html = f"""
             <div class="label-sm">Generated Image</div>
             <div class="generated-image">
-                <img src="data:image/png;base64,{b64}" alt="Generated image for {self.escape_html(set_.get('set_id', ''))}"/>
+                <img src="data:{mime};base64,{b64}" alt="Generated image for {self.escape_html(set_.get('set_id', ''))}"/>
             </div>"""
             else:
                 image_html = ""

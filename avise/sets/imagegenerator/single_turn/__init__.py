@@ -1,1 +1,2 @@
 from .policy_compliance import PolicyComplianceTest
+from .prompt_injection import PromptInjectionTest

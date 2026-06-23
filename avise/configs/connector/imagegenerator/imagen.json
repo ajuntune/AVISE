@@ -4,7 +4,7 @@
         "type": "image_generator",
         "name": "imagen-4.0-generate-001",
         "project_id": "PROJECT_ID",
-        "location": "LOCATION",
+        "location": "us-central1",
         "model": "imagen-4.0-generate-001",
         "aspect_ratio": "1:1",
         "number_of_images": 1

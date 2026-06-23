@@ -47,6 +47,7 @@ DEFAULT_SET_CONFIGS = {
     "context_test": "configs/SET/languagemodel/multi_turn/context_test.json",
     # Image generator SETs
     "image_policy_compliance": "configs/SET/imagegenerator/single_turn/image_policy_compliance.json",
+    "image_prompt_injection": "configs/SET/imagegenerator/single_turn/image_prompt_injection.json",
 }
 
 

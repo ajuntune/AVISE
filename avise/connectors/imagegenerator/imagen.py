@@ -42,8 +42,12 @@ try:
     from google import genai
     from google.genai import types as genai_types
     _GENAI_AVAILABLE = True
-except ImportError:
-    _GENAI_AVAILABLE = False
+#except ImportError:
+#    _GENAI_AVAILABLE = False
+except Exception as e:
+    import traceback
+    traceback.print_exc()
+    raise
 
 from .base import BaseImageGenConnector
 from ...registry import connector_registry

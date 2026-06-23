@@ -1,5 +1,6 @@
 """Class for Evaluation Language Model."""
 
+import base64
 from pathlib import Path
 import logging
 import os
@@ -157,6 +158,40 @@ class EvaluationLanguageModel:
             return self.history
         return [{"role": "assistant", "content": response}]
 
+    def generate_with_image(self, prompt: str, image_bytes: bytes) -> list:
+        """Generate a response to a text prompt that includes an image.
+
+        Mirrors generate() but passes the image as a base64-encoded data URL
+        alongside the text prompt. Intended for visual evaluation tasks such
+        as checking whether a generated image contains harmful content.
+
+        Args:
+            prompt: Evaluation prompt describing the task.
+            image_bytes: Raw image bytes from the image generator output.
+
+        Returns:
+            List containing one dict: {"role": "assistant", "content": response}.
+        """
+        mime_type = self._detect_image_mime_type(image_bytes)
+        b64 = base64.b64encode(image_bytes).decode("utf-8")
+        data_url = f"data:{mime_type};base64,{b64}"
+
+        messages = [
+            # System prompt stays as a plain string — _mistral_vision_generation
+            # normalises it to list format internally.
+            self.system_prompt,
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": data_url}},
+                    {"type": "text", "text": prompt},
+                ],
+            },
+        ]
+
+        response = self._mistral_vision_generation(messages)
+        return [{"role": "assistant", "content": response}]
+
     def _mistral_text_generation(self, messages: list) -> str:
         """Helper method for generating responses with Mistral models from pure
         text inputs. Returns generated response as a string.
@@ -177,12 +212,9 @@ class EvaluationLanguageModel:
             k: v.to(device=self.device) if hasattr(v, "to") else v
             for k, v in tokenized.items()
         }
-        # tokenized["pixel_values"] = tokenized["pixel_values"].to(dtype=bfloat16, device=self.device)
-        # image_sizes = [tokenized["pixel_values"].shape[-2:]]
 
         output = self.model.generate(
             **tokenized,
-            # image_sizes=image_sizes,
             max_new_tokens=self.max_new_tokens,
         )[0]
 
@@ -190,6 +222,66 @@ class EvaluationLanguageModel:
             output[len(tokenized["input_ids"][0]) :]
         ).replace("</s>", "")
         return decoded_output
+
+    def _mistral_vision_generation(self, messages: list) -> str:
+        """Helper method for generating responses with Mistral models from
+        multimodal (image + text) inputs. Returns generated response as a string.
+
+        Args:
+            messages: Message list where the user turn may contain image_url
+                content chunks. System messages with plain string content are
+                normalised to the list format automatically.
+        """
+        # Normalise all messages so content is always a list of typed chunks.
+        # System messages arrive as plain strings; user messages with images
+        # are already in list format from generate_with_image().
+        formatted = []
+        for m in messages:
+            if isinstance(m["content"], str):
+                formatted.append(
+                    {**m, "content": [{"type": "text", "text": m["content"]}]}
+                )
+            else:
+                formatted.append(m)
+
+        tokenized = self.tokenizer.apply_chat_template(
+            formatted, return_tensors="pt", return_dict=True
+        )
+
+        # Move all tensors to the correct device
+        tokenized = {
+            k: v.to(device=self.device) if hasattr(v, "to") else v
+            for k, v in tokenized.items()
+        }
+        # Enable pixel_values for vision input — convert to bfloat16 on the
+        # target device (mirrors the originally commented-out vision path).
+        if "pixel_values" in tokenized and tokenized["pixel_values"] is not None:
+            tokenized["pixel_values"] = tokenized["pixel_values"].to(
+                dtype=torch.bfloat16, device=self.device
+            )
+
+        output = self.model.generate(
+            **tokenized,
+            max_new_tokens=self.max_new_tokens,
+        )[0]
+
+        return self.tokenizer.decode(
+            output[len(tokenized["input_ids"][0]) :]
+        ).replace("</s>", "")
+
+    @staticmethod
+    def _detect_image_mime_type(image_bytes: bytes) -> str:
+        """Detect MIME type from image magic bytes.
+
+        Falls back to ``image/png`` if the format cannot be determined.
+        """
+        if image_bytes[:8] == b"\x89PNG\r\n\x1a\n":
+            return "image/png"
+        if image_bytes[:2] == b"\xff\xd8":
+            return "image/jpeg"
+        if image_bytes[:4] == b"RIFF" and image_bytes[8:12] == b"WEBP":
+            return "image/webp"
+        return "image/png"
 
     def del_model(self):
         """Delete the model from GPU memory."""
