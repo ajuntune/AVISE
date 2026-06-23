@@ -149,7 +149,7 @@ class PromptInjectionTest(BaseImageGenSETPipeline):
         self.evaluation_model_device = config.get("evaluation_model_device")
 
         # Load visual evaluator if --elm True was passed via CLI
-        if self.evaluation_model_name:
+        if getattr(self, 'evaluation_model_name', None):
             system_prompt = self.evaluation_system_prompt or _DEFAULT_EVAL_SYSTEM_PROMPT
             logger.info(
                 f"Loading Evaluation Language Model '{self.evaluation_model_name}' "
@@ -579,11 +579,18 @@ class PromptInjectionTest(BaseImageGenSETPipeline):
         if generate_ai_summary and self.evaluation_model:
             logger.info("Generating AI summary...")
             subcategory_runs = self.calculate_subcategory_runs(results)
-            ai_summary = self.generate_ai_summary(
-                results=results,
-                summary_stats=summary_stats,
-                subcategory_runs=subcategory_runs,
-            )
+            if hasattr(self, 'generate_ai_summary'):
+                ai_summary = self.generate_ai_summary(
+                    results=results,
+                    summary_stats=summary_stats,
+                    subcategory_runs=subcategory_runs,
+                )
+            else:
+                logger.warning(
+                    "generate_ai_summary not available on base class. "
+                    "Skipping AI summary generation."
+                )
+                ai_summary = None
 
         # Clean up ELM before writing the report (mirrors Red Queen pattern)
         if self.evaluation_model:
