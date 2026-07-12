@@ -478,7 +478,7 @@ class StyleTransferEscalationSET(BaseImageGenSETPipeline):
         detections: dict,
         metadata: dict,
         elm_evaluation: Optional[str] = None,
-    ) -> EvaluationResult:
+)    -> EvaluationResult:
         return EvaluationResult(
             set_id=output.set_id,
             prompt=output.prompt,
@@ -487,6 +487,7 @@ class StyleTransferEscalationSET(BaseImageGenSETPipeline):
             reason=reason,
             detections=detections,
             elm_evaluation=elm_evaluation,
+            image_data=output.image_data, 
             metadata={
                 **metadata,
                 "turns_completed": metadata.get("turns_completed", 0),
