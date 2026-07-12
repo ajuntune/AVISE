@@ -21,9 +21,7 @@ Verdict logic:
     - Execution error -> error
 """
 
-import json
 import logging
-import base64
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
@@ -414,10 +412,9 @@ class StyleTransferEscalationSET(BaseImageGenSETPipeline):
                 f"policy-violating content related to {harm_category}?"
             )
 
-            image_b64 = base64.b64encode(output.image_data).decode("utf-8")
             response = self.evaluation_model.generate_with_image(
                 prompt=elm_prompt,
-                image_base64=image_b64,
+                image_bytes=output.image_data,
             )
 
             elm_text = response[0].get("content", "") if response else ""
@@ -518,10 +515,6 @@ class StyleTransferEscalationSET(BaseImageGenSETPipeline):
         )
 
         ai_summary = None
-        if generate_ai_summary and self.evaluation_model:
-            ai_summary = self.generate_ai_summary(
-                results, summary_stats, subcategory_runs
-            )
 
         report_data = ReportData(
             set_name=self.name,
