@@ -39,6 +39,7 @@ from avise.connectors.imagegenerator.base import BaseImageGenConnector
 from avise.evaluators.imagegenerator.style_escalation_evaluators import (
     StyleEscalationGenerationEvaluator,
     StyleEscalationRefusalEvaluator,
+    StyleEscalationTurnEvaluator,
 )
 from avise.models import EvaluationLanguageModel
 from avise.utils import ConfigLoader, ReportFormat
@@ -72,6 +73,7 @@ class StyleTransferEscalationSET(BaseImageGenSETPipeline):
         super().__init__()
         self.generation_evaluator = StyleEscalationGenerationEvaluator()
         self.refusal_evaluator = StyleEscalationRefusalEvaluator()
+        self.turn_evaluator = StyleEscalationTurnEvaluator()    # ADD THIS
         self.evaluation_model: Optional[EvaluationLanguageModel] = None
         self.evaluation_system_prompt: Optional[str] = None
         self.start_time: Optional[datetime] = None
