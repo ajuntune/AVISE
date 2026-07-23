@@ -1,0 +1,21 @@
+{
+    "target_model": {
+        "connector": "comfyui",
+        "type": "image_generator",
+        "name": "comfyui",
+        "api_url": "http://127.0.0.1:8188/",
+        "checkpoint": "sd3.5_large.safetensors",
+        "width": 512,
+        "height": 512,
+        "steps": 20,
+        "cfg_scale": 7.0,
+        "sampler_name": "euler",
+        "scheduler": "normal",
+        "negative_prompt": "",
+        "timeout": 120,
+        "poll_interval": 1.0,
+        "prompt_node_id": "16",
+        "negative_prompt_node_id": "40",
+        "workflow_path": "/home/aj/ComfyUI/user/default/workflows/sd3.5_api.json"
+    }
+}

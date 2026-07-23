@@ -286,7 +286,11 @@ class EvaluationLanguageModel:
     def del_model(self):
         """Delete the model from GPU memory."""
         if self.model:
-            self.model.cpu()
+            # Models loaded with device_map (Accelerate dispatch) contain meta
+            # tensors that have no backing data, so .cpu() raises
+            # NotImplementedError. Skip the move and let GC handle it instead.
+            if not hasattr(self.model, "hf_device_map"):
+                self.model.cpu()
             del self.model
             del self.tokenizer
             torch.cuda.empty_cache()
