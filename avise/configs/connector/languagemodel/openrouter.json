@@ -1,0 +1,14 @@
+{
+    "target_model": {
+        "connector": "openrouter-lm",
+        "type": "language_model",
+        "name": "openai/gpt-4o-mini",
+        "api_url": null,
+        "api_key": "",
+        "site_url": null,
+        "site_name": null,
+        "headers": null,
+        "max_tokens": 512,
+        "completion_kwargs": {}
+    }
+}
