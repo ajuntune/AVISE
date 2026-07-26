@@ -196,10 +196,10 @@ def main(arguments=None) -> None:
     # Predefined connector configs (image generator)
     elif args.connectorconf == "stable_diffusion":
         args.connectorconf = "configs/connector/imagegenerator/stable_diffusion.json"
-    elif args.connectorconf == "gemini_image":
-        args.connectorconf = "configs/connector/imagegenerator/gemini.json"
     elif args.connectorconf == "imagen":
         args.connectorconf = "configs/connector/imagegenerator/imagen.json"
+    elif args.connectorconf == "comfyui":
+        args.connectorconf = "configs/connector/imagegenerator/comfyui.json"
 
     for set_ in args.SET:
         try:

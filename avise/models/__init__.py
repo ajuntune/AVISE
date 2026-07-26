@@ -1,2 +1,3 @@
 from .adversarial_lm import AdversarialLanguageModel
 from .evaluation_lm import EvaluationLanguageModel
+from .image_safety_lm import ImageSafetyEvaluationModel
