@@ -1,0 +1,20 @@
+{
+    "target_model": {
+        "connector": "openrouter-image",
+        "type": "image_generator",
+        "name": "bytedance-seed/seedream-4.5",
+        "api_key": "",
+        "api_url": null,
+        "site_url": null,
+        "site_name": null,
+        "headers": null,
+        "n": 1,
+        "aspect_ratio": null,
+        "resolution": null,
+        "quality": null,
+        "output_format": null,
+        "seed": null,
+        "timeout": 120,
+        "generation_kwargs": {}
+    }
+}
