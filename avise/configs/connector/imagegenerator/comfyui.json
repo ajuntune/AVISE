@@ -3,8 +3,8 @@
         "connector": "comfyui",
         "type": "image_generator",
         "name": "comfyui",
-        "api_url": "http://127.0.0.1:8188/",
-        "checkpoint": "sd3.5_large.safetensors",
+        "api_url": "API_URL",
+        "checkpoint": "CHECKPOINT_MODEL",
         "width": 512,
         "height": 512,
         "steps": 20,
@@ -16,6 +16,6 @@
         "poll_interval": 1.0,
         "prompt_node_id": "16",
         "negative_prompt_node_id": "40",
-        "workflow_path": "/home/aj/ComfyUI/user/default/workflows/sd3.5_api.json"
+        "workflow_path": "WORKFLOW_PATH"
     }
 }
